@@ -9,6 +9,7 @@ let gamePattern = []
 let currentLevel = 0;
 let userClickedPattern = [];
 let valueChecker = 0;
+let started = false;
 //for playing the button animations
 const playTheAnimation =(selectedColor) =>{
     var music = new Audio(`./sounds/${selectedColor}.mp3`);
@@ -26,19 +27,22 @@ const newSequence =() =>{
 //for termination condition handling and reseting the game
 const gameOver = () =>{
     console.log("game terminated")
-    $(body).addclass("game-over")
+    $("body").addClass("game-over")
     setTimeout(()=>{
-        $(body).removeclass("game-over")
-    },200)
-    start()
+        $("body").removeClass("game-over")
+    },200);
+    restart()
 }
 //for validating the users clicks
 const gameChecker = (value) =>{
-    if (value == gamepattern[valueChecker] && gamePattern[valueChecker + 1] == null){
+    console.log(gamePattern)
+    if (value == gamePattern[valueChecker] && gamePattern[valueChecker + 1] == null){
         nextSequence()
     }else{
         if(value == gamePattern[valueChecker]){
+            valueChecker++;
             return
+
         }else{
             gameOver()
         }
@@ -54,26 +58,28 @@ const userClicked = (color) =>{
     playTheAnimation(color)
     userClickedPattern.push(color);
     console.log(userClickedPattern)
-    gameChecker(userClickPattern.pop())
-    valueChecker++;
+    gameChecker(userClickedPattern.pop())
 }
-buttonColors.map((color) =>{
-    console.log(color)
-    $(`#${color}`).click(() =>{userClicked(color)})
-})
 //for tracking the level 
 const nextSequence = () =>{
-    currentLevel++;
-    $('#level-title').text(`level - ${currentLevel}`)
     valueChecker = 0;
+    currentLevel++;
+    $('#level-title').text(`level - ${currentLevel}`);
     newSequence();
 }
-
-const start = () =>{
-    $('#level-title').text(`Press A Key to Start`)
+const restart = () =>{
+    $(`#level-title`).text(`Game Over Enter A Key To Restart.`);
     gamePattern = [];
-    $(this).keypress(() =>{
-        nextSequence();
-    })
+    currentLevel = 0;
+    started = false;
 }
-start()
+//game starting potion
+$(document).keypress(() =>{
+    if(!started){
+        nextSequence()
+        started = true;
+    }
+})
+buttonColors.map((color) =>{
+    $(`#${color}`).click(() =>{userClicked(color)})
+});
